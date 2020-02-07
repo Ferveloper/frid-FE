@@ -1,0 +1,42 @@
+[
+  {
+    "UID": "E2004144850502080540E0B9",
+    "type": "position",
+    "description": "Tag cuadrado"
+  },
+  {
+    "UID": "E2000015790D026322602F2D",
+    "type": "position",
+    "description": "Tag rectangular"
+  },
+  {
+    "UID": "E20000190916014925101707",
+    "type": "article",
+    "description": "Tarjeta 1"
+  },
+  {
+    "UID": "E20000199205005325401D36",
+    "type": "article",
+    "description": "Tarjeta 2"
+  },
+  {
+    "UID": "E200001992050079245032BF",
+    "type": "article",
+    "description": "Tarjeta 3"
+  },
+  {
+    "UID": "E20000199205015624008052",
+    "type": "article",
+    "description": "Tarjeta 4"
+  },
+  {
+    "UID": "E2000019920502612010EB46",
+    "type": "article",
+    "description": "Tarjeta 5"
+  },
+  {
+    "UID": "E2000019920501912400AA1F",
+    "type": "article",
+    "description": "Tarjeta 6"
+  }
+]
