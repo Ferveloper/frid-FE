@@ -24,9 +24,25 @@ var server = http.createServer(app);
 /**
  * Configure Socket.io
  */
+
 var io = require('socket.io')(server);
-io.on('connection', function(socket){
+io.on('connection', function (socket) {
   console.log('a user connected');
+  socket.on('disconnect', function () {
+    console.log('user disconnected');
+  });
+});
+
+/**
+ * Configure cote
+ */
+
+const cote = require('cote');
+const tagService = new cote.Responder({ name: 'Tag Service' });
+ 
+tagService.on('notification', (tag, done) => {
+    io.emit('notification', tag);
+  done(`Tag recibido: ${tag.UID} (${tag.description})`);
 });
 
 /**

@@ -6,8 +6,7 @@
   </head>
   <body>
     <h1><%= title %></h1>
-    <p>RFID Demo</p>
-    <ul id="list"></ul>
+    <p>Welcome to <%= title %></p>
     <script src="/socket.io/socket.io.js"></script>
     <script>
       var socket = io();

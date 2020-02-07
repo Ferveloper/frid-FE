@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const cote = require('cote');
+const requester = new cote.Requester({ name: 'Tag Notifier' });
 var tags = JSON.parse(fs.readFileSync('tags.json'));
 var tagsUIDs = tags.map(tag => tag.UID);
 
@@ -14,8 +15,8 @@ var tagsUIDs = tags.map(tag => tag.UID);
 //   };
 // });
 
-var filename = fs.readdirSync('./').filter( file => file.includes('NTFLog_')).reverse()[0];
-var logPath = './' + filename;
+var filename = fs.readdirSync('../').filter( file => file.includes('NTFLog_')).reverse()[0];
+var logPath = '../' + filename;
 console.log(`Leyendo datos de ${filename}`);
 
 // Get log size
@@ -32,10 +33,20 @@ function printUID(newFileSizeInBytes) {
   // console.log("TCL: printUID -> fields", fields)
   var UID = fields[3];
   var time = fields[6];
-  var type = tagsUIDs.includes(UID) ? tags.filter(tag => tag.UID === UID)[0].type : undefined;
+  var kind = tagsUIDs.includes(UID) ? tags.filter(tag => tag.UID === UID)[0].type : undefined;
   var description = tagsUIDs.includes(UID) ? tags.filter(tag => tag.UID === UID)[0].description : undefined;
 
-  console.log(`UID : ${UID}, Time : ${time}, Type : ${type}, Description : ${description}, Log size : ${newFileSizeInBytes} bytes`)
+  console.log(`UID : ${UID}, Time : ${time}, Type : ${kind}, Description : ${description}, Log size : ${newFileSizeInBytes} bytes`);
+
+  requester.send({
+    type: 'notification',
+    UID: UID,
+    time: time,
+    kind: kind,
+    description: description
+  }, response => {
+    console.log(`Respuesta --> ${response}`, Date.now());
+  });
 }
 
 function checkFileSize() {
