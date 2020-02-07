@@ -41,7 +41,8 @@ const cote = require('cote');
 const tagService = new cote.Responder({ name: 'Tag Service' });
  
 tagService.on('notification', (tag, done) => {
-    io.emit('notification', tag);
+  console.log(`Tag recibido: ${tag.UID} (${tag.description})`)
+  io.emit('notification', tag);
   done(`Tag recibido: ${tag.UID} (${tag.description})`);
 });
 

@@ -6,11 +6,17 @@
   </head>
   <body>
     <h1><%= title %></h1>
-    <p>RFID Demo</p>
-    <ul id="list"></ul>
+    <p>Tags leidos</p>
+    <ul id="tags"></ul>
     <script src="/socket.io/socket.io.js"></script>
     <script>
       var socket = io();
+      socket.on('notification', function(tag) {
+        console.log('Notificación recibida');
+        var li = document.createElement('li');
+        li.innerHTML = tag.UID;
+        document.querySelector('#tags').appendChild(li);
+      });
     </script>
   </body>
 </html>
