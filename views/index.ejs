@@ -6,16 +6,47 @@
   </head>
   <body>
     <h1><%= title %></h1>
-    <p>Tags leidos</p>
+    <p><strong>TAGS</strong></p>
+    <form action="">
+      <div class="grid">
+        <label for="article">Artículo</label><input id="article" type="text" disabled>
+        <label for="position">Posición</label><input id="position" type="text" disabled>
+        <input class="button" type="button" value="Vincular" onclick="link">
+      </div>
+    </form>
+    <table>
+      <tr>
+        <th>ARTÍCULO</th>
+        <th>POSICIÓN</th>
+      </tr>
+      <tr>
+        <td>E2004144850502080540E0B9</td>
+        <td>E2004144850502080540E0B9</td>
+      </tr>
+    </table>
     <ul id="tags"></ul>
     <script src="/socket.io/socket.io.js"></script>
     <script>
       var socket = io();
       socket.on('notification', function(tag) {
         console.log('Notificación recibida');
-        var li = document.createElement('li');
-        li.innerHTML = tag.UID;
-        document.querySelector('#tags').appendChild(li);
+        // var li = document.createElement('li');
+        // li.innerHTML = tag.UID;
+        // document.querySelector('#tags').appendChild(li);
+
+        var article = document.querySelector('#article')
+        var position = document.querySelector('#position')
+
+        if (tag.kind === 'article' && article.value === '') {
+          article.disabled = false;
+          article.value = tag.UID;
+          article.disabled = true;
+        }
+        if (tag.kind === 'position' && position.value === '') {
+          article.disabled = false;
+          position.value = tag.UID;
+          article.disabled = true;
+        }
       });
     </script>
   </body>
