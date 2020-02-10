@@ -50,7 +50,7 @@ tagService.on('notification', (tag, done) => {
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen("8080", "0.0.0.0");
+server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
