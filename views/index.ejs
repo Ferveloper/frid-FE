@@ -7,21 +7,26 @@
   <body>
     <h1><%= title %></h1>
     <p><strong>TAGS</strong></p>
-    <form action="">
-      <div class="grid">
-        <label for="article">Artículo</label><input id="article" type="text" disabled>
-        <label for="position">Posición</label><input id="position" type="text" disabled>
-        <input class="button" type="button" value="Vincular" onclick="link">
-      </div>
+    <form id="form" action="" class="grid">
+        <div></div><div class="field">UID</div><div class="field">Descripción</div>
+        <label for="article">Artículo</label>
+        <input id="articleUID" type="text" disabled>
+        <input id="articleDesc" type="text" disabled>
+        <label for="position">Posición</label>
+        <input id="positionUID" type="text" disabled>
+        <input id="positionDesc" type="text" disabled>
+        <button id="button" class="button">Vincular</button>
     </form>
-    <table>
+    <table id="table">
       <tr>
-        <th>ARTÍCULO</th>
-        <th>POSICIÓN</th>
+        <th colspan="2">ARTÍCULO</th>
+        <th colspan="2">POSICIÓN</th>
       </tr>
       <tr>
+        <!-- <td>E2004144850502080540E0B9</td>
+        <td>Artículo 0</td>
         <td>E2004144850502080540E0B9</td>
-        <td>E2004144850502080540E0B9</td>
+        <td>Posición 0</td> -->
       </tr>
     </table>
     <ul id="tags"></ul>
@@ -34,20 +39,71 @@
         // li.innerHTML = tag.UID;
         // document.querySelector('#tags').appendChild(li);
 
-        var article = document.querySelector('#article')
-        var position = document.querySelector('#position')
+        var articleUID = document.querySelector('#articleUID');
+        var positionUID = document.querySelector('#positionUID');
+        var articleDesc = document.querySelector('#articleDesc');
+        var positionDesc = document.querySelector('#positionDesc');
 
-        if (tag.kind === 'article' && article.value === '') {
-          article.disabled = false;
-          article.value = tag.UID;
-          article.disabled = true;
+        if (tag.kind === 'article' && articleUID.value === '') {
+          articleUID.disabled = false;
+          articleUID.value = tag.UID;
+          articleUID.disabled = true;
+          articleDesc.disabled = false;
+          articleDesc.value = tag.description;
+          articleDesc.disabled = true;
+          sessionStorage.setItem('articleUID', tag.UID);
+          sessionStorage.setItem('articleDesc', tag.description);
         }
-        if (tag.kind === 'position' && position.value === '') {
-          article.disabled = false;
-          position.value = tag.UID;
-          article.disabled = true;
+        if (tag.kind === 'position' && positionUID.value === '') {
+          positionUID.disabled = false;
+          positionUID.value = tag.UID;
+          positionUID.disabled = true;
+          positionDesc.disabled = false;
+          positionDesc.value = tag.description;
+          positionDesc.disabled = true;
+          sessionStorage.setItem('positionUID', tag.UID);
+          sessionStorage.setItem('positionDesc', tag.description);
         }
       });
+
+      function submitForm(e) {
+        e.preventDefault();
+        console.log('Vincular');
+        var articleUID = sessionStorage.getItem('articleUID');
+        var articleDesc = sessionStorage.getItem('articleDesc');
+        var positionUID = sessionStorage.getItem('positionUID');
+        var positionDesc = sessionStorage.getItem('positionDesc');
+        if (!articleUID || !positionUID) return;
+        var table = document.querySelector('#table');
+        var articleTdUID = document.createElement('td');
+        var positionTdUID = document.createElement('td');
+        var articleTdDesc = document.createElement('td');
+        var positionTdDesc = document.createElement('td');
+        var tr = document.createElement('tr');
+        table.appendChild(tr);
+        tr.appendChild(articleTdUID).append(articleUID);
+        tr.appendChild(articleTdDesc).append(articleDesc);
+        tr.appendChild(positionTdUID).append(positionUID);
+        tr.appendChild(positionTdDesc).append(positionDesc);
+        document.querySelector('#articleUID').disabled = false;
+        document.querySelector('#articleUID').value = '';
+        document.querySelector('#articleUID').disabled = true;
+        document.querySelector('#articleDesc').disabled = false;
+        document.querySelector('#articleDesc').value = '';
+        document.querySelector('#articleDesc').disabled = true;
+        document.querySelector('#positionUID').disabled = false;
+        document.querySelector('#positionUID').value = '';
+        document.querySelector('#positionUID').disabled = true;
+        document.querySelector('#positionDesc').disabled = false;
+        document.querySelector('#positionDesc').value = '';
+        document.querySelector('#positionDesc').disabled = true;
+        sessionStorage.setItem('articleUID', '');
+        sessionStorage.setItem('positionUID', '');
+      };
+
+      const form = document.querySelector('#form')
+      form.addEventListener('submit', submitForm)
+
     </script>
   </body>
 </html>

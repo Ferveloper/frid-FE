@@ -17,7 +17,7 @@ var tagsUIDs = tags.map(tag => tag.UID);
 
 var filename = fs.readdirSync('../').filter( file => file.includes('NTFLog_')).reverse()[0];
 var logPath = '../' + filename;
-console.log(`Leyendo datos de ${filename}`);
+console.log(`[NOTIFIER] Leyendo datos de ${filename}`);
 
 // Get log size
 var stats = fs.statSync(logPath);
@@ -36,7 +36,7 @@ function printUID(newFileSizeInBytes) {
   var kind = tagsUIDs.includes(UID) ? tags.filter(tag => tag.UID === UID)[0].type : undefined;
   var description = tagsUIDs.includes(UID) ? tags.filter(tag => tag.UID === UID)[0].description : undefined;
 
-  console.log(`UID : ${UID}, Time : ${time}, Type : ${kind}, Description : ${description}, Log size : ${newFileSizeInBytes} bytes`);
+  console.log(`[NOTIFIER] UID : ${UID}, Time : ${time}, Type : ${kind}, Description : ${description}, Log size : ${newFileSizeInBytes} bytes`);
 
   requester.send({
     type: 'notification',
@@ -45,7 +45,7 @@ function printUID(newFileSizeInBytes) {
     kind: kind,
     description: description
   }, response => {
-    console.log(`Respuesta --> ${response}`, Date.now());
+    console.log(`[NOTIFIER] Respuesta --> ${response}`, Date.now());
   });
 }
 
