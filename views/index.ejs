@@ -15,7 +15,9 @@
         <label for="position">Posición</label>
         <input id="positionUID" type="text" disabled>
         <input id="positionDesc" type="text" disabled>
-        <button id="button" class="button">Vincular</button>
+        <button id="link" name="link" class="button">Vincular</button>
+        <button id="unlink"name="unlink"  class="button">Desvincular</button>
+        <button id="clean"name="clean"  class="button">Limpiar</button>
     </form>
     <table id="table">
       <tr>
@@ -32,77 +34,216 @@
     <ul id="tags"></ul>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      var socket = io();
-      socket.on('notification', function(tag) {
-        console.log('Notificación recibida');
-        // var li = document.createElement('li');
-        // li.innerHTML = tag.UID;
-        // document.querySelector('#tags').appendChild(li);
-
-        var articleUID = document.querySelector('#articleUID');
-        var positionUID = document.querySelector('#positionUID');
-        var articleDesc = document.querySelector('#articleDesc');
-        var positionDesc = document.querySelector('#positionDesc');
-
-        if (tag.kind === 'article' && articleUID.value === '') {
-          articleUID.disabled = false;
-          articleUID.value = tag.UID;
-          articleUID.disabled = true;
-          articleDesc.disabled = false;
-          articleDesc.value = tag.description;
-          articleDesc.disabled = true;
-          sessionStorage.setItem('articleUID', tag.UID);
-          sessionStorage.setItem('articleDesc', tag.description);
+        if (!localStorage.getItem('links')) {
+          localStorage.setItem('links', JSON.stringify([]));
+        } else {
+          var links = JSON.parse(localStorage.getItem('links'))
+          links.forEach(link => {
+            var articleUID = link.articleUID;
+            var articleDesc = link.articleDesc;
+            var positionUID = link.positionUID;
+            var positionDesc = link.positionDesc;
+            appendRow(articleUID, articleDesc, positionUID, positionDesc)
+          })
         }
-        if (tag.kind === 'position' && positionUID.value === '') {
-          positionUID.disabled = false;
-          positionUID.value = tag.UID;
-          positionUID.disabled = true;
-          positionDesc.disabled = false;
-          positionDesc.value = tag.description;
-          positionDesc.disabled = true;
-          sessionStorage.setItem('positionUID', tag.UID);
-          sessionStorage.setItem('positionDesc', tag.description);
-        }
-      });
 
-      function submitForm(e) {
-        e.preventDefault();
-        console.log('Vincular');
-        var articleUID = sessionStorage.getItem('articleUID');
-        var articleDesc = sessionStorage.getItem('articleDesc');
-        var positionUID = sessionStorage.getItem('positionUID');
-        var positionDesc = sessionStorage.getItem('positionDesc');
-        if (!articleUID || !positionUID) return;
-        var table = document.querySelector('#table');
-        var articleTdUID = document.createElement('td');
-        var positionTdUID = document.createElement('td');
-        var articleTdDesc = document.createElement('td');
-        var positionTdDesc = document.createElement('td');
-        var tr = document.createElement('tr');
-        table.appendChild(tr);
-        tr.appendChild(articleTdUID).append(articleUID);
-        tr.appendChild(articleTdDesc).append(articleDesc);
-        tr.appendChild(positionTdUID).append(positionUID);
-        tr.appendChild(positionTdDesc).append(positionDesc);
-        document.querySelector('#articleUID').disabled = false;
-        document.querySelector('#articleUID').value = '';
-        document.querySelector('#articleUID').disabled = true;
-        document.querySelector('#articleDesc').disabled = false;
-        document.querySelector('#articleDesc').value = '';
-        document.querySelector('#articleDesc').disabled = true;
-        document.querySelector('#positionUID').disabled = false;
-        document.querySelector('#positionUID').value = '';
-        document.querySelector('#positionUID').disabled = true;
-        document.querySelector('#positionDesc').disabled = false;
-        document.querySelector('#positionDesc').value = '';
-        document.querySelector('#positionDesc').disabled = true;
-        sessionStorage.setItem('articleUID', '');
-        sessionStorage.setItem('positionUID', '');
-      };
+        var socket = io();
+        socket.on('notification', function (tag) {
+          console.log('Notificación recibida');
+          // var li = document.createElement('li');
+          // li.innerHTML = tag.UID;
+          // document.querySelector('#tags').appendChild(li);
 
-      const form = document.querySelector('#form')
-      form.addEventListener('submit', submitForm)
+          var links = JSON.parse(localStorage.getItem('links'));
+
+          var articleUID = document.querySelector('#articleUID');
+          var positionUID = document.querySelector('#positionUID');
+          var articleDesc = document.querySelector('#articleDesc');
+          var positionDesc = document.querySelector('#positionDesc');
+
+          if (tag.kind === 'article' && articleUID.value === '') {
+            articleUID.disabled = false;
+            articleUID.value = tag.UID;
+            articleUID.disabled = true;
+            articleDesc.disabled = false;
+            articleDesc.value = tag.description;
+            articleDesc.disabled = true;
+            sessionStorage.setItem('articleUID', tag.UID);
+            sessionStorage.setItem('articleDesc', tag.description);
+          }
+
+          if (tag.kind === 'position' && positionUID.value === '') {
+            positionUID.disabled = false;
+            positionUID.value = tag.UID;
+            positionUID.disabled = true;
+            positionDesc.disabled = false; 
+            positionDesc.value = tag.description;
+            positionDesc.disabled = true;
+            sessionStorage.setItem('positionUID', tag.UID);
+            sessionStorage.setItem('positionDesc', tag.description);
+          }
+
+          if (articleUID.value !== '' && positionUID.value !== '') {
+            if (links.filter(link => link.positionUID === positionUID.value).length === 0) {
+              document.querySelector('#unlink').disabled = true;
+              document.querySelector('#link').disabled = false;
+            } else {
+              document.querySelector('#unlink').disabled = false;
+              document.querySelector('#link').disabled = true;
+            }
+          }
+        });
+
+        function appendRow(articleUID, articleDesc, positionUID, positionDesc) {
+          var table = document.querySelector('#table');
+          var articleTdUID = document.createElement('td');
+          var positionTdUID = document.createElement('td');
+          var articleTdDesc = document.createElement('td');
+          var positionTdDesc = document.createElement('td');
+          var tr = document.createElement('tr');
+          tr.id = positionUID;
+          table.appendChild(tr);
+          tr.appendChild(articleTdUID).append(articleUID);
+          tr.appendChild(articleTdDesc).append(articleDesc);
+          tr.appendChild(positionTdUID).append(positionUID);
+          tr.appendChild(positionTdDesc).append(positionDesc);
+        };
+
+        function cleanForm() {
+          document.querySelector('#articleUID').disabled = false;
+          document.querySelector('#articleUID').value = '';
+          document.querySelector('#articleUID').disabled = true;
+          document.querySelector('#articleDesc').disabled = false;
+          document.querySelector('#articleDesc').value = '';
+          document.querySelector('#articleDesc').disabled = true;
+          document.querySelector('#positionUID').disabled = false;
+          document.querySelector('#positionUID').value = '';
+          document.querySelector('#positionUID').disabled = true;
+          document.querySelector('#positionDesc').disabled = false;
+          document.querySelector('#positionDesc').value = '';
+          document.querySelector('#positionDesc').disabled = true;
+          sessionStorage.setItem('articleUID', '');
+          sessionStorage.setItem('articleDesc', '');
+          sessionStorage.setItem('positionUID', '');
+          sessionStorage.setItem('positionDesc', '');
+        };
+
+        function submitForm(e) {
+          e.preventDefault();
+          var name = e.explicitOriginalTarget.name;
+          console.log(name);
+
+          var links = JSON.parse(localStorage.getItem('links'));
+
+          if (name === 'link') {
+            //var articleUID = sessionStorage.getItem('articleUID');
+            //var articleDesc = sessionStorage.getItem('articleDesc');
+            //var positionUID = sessionStorage.getItem('positionUID');
+            //var positionDesc = sessionStorage.getItem('positionDesc');
+
+            var articleUID = document.querySelector('#articleUID').value;
+            console.log("TCL: submitForm -> articleUID", articleUID)
+            var articleDesc = document.querySelector('#articleDesc').value;
+            console.log("TCL: submitForm -> articleDesc", articleDesc)
+            var positionUID = document.querySelector('#positionUID').value;
+            console.log("TCL: submitForm -> positionUID", positionUID)
+            var positionDesc = document.querySelector('#positionDesc').value;
+            console.log("TCL: submitForm -> positionDesc", positionDesc)
+
+            if (!articleUID || !positionUID || links.filter(link => link.positionUID === positionUID).length !== 0) return;
+
+            var table = document.querySelector('#table');
+            var articleTdUID = document.createElement('td');
+            var positionTdUID = document.createElement('td');
+            var articleTdDesc = document.createElement('td');
+            var positionTdDesc = document.createElement('td');
+            var tr = document.createElement('tr');
+            tr.id = positionUID;
+            table.appendChild(tr);
+            tr.appendChild(articleTdUID).append(articleUID);
+            tr.appendChild(articleTdDesc).append(articleDesc);
+            tr.appendChild(positionTdUID).append(positionUID);
+            tr.appendChild(positionTdDesc).append(positionDesc);
+
+            //document.querySelector('#articleUID').disabled = false;
+            //document.querySelector('#articleUID').value = '';
+            //document.querySelector('#articleUID').disabled = true;
+            //document.querySelector('#articleDesc').disabled = false;
+            //document.querySelector('#articleDesc').value = '';
+            //document.querySelector('#articleDesc').disabled = true;
+            //document.querySelector('#positionUID').disabled = false;
+            //document.querySelector('#positionUID').value = '';
+            //document.querySelector('#positionUID').disabled = true;
+            //document.querySelector('#positionDesc').disabled = false;
+            //document.querySelector('#positionDesc').value = '';
+            //document.querySelector('#positionDesc').disabled = true;
+
+            var link = {
+              articleUID: articleUID,
+              articleDesc: articleDesc,
+              positionUID: positionUID,
+              positionDesc: positionDesc
+            };
+
+            links.push(link)
+            links = localStorage.setItem('links', JSON.stringify(links))
+
+            cleanForm();
+            document.querySelector('#unlink').disabled = false;
+            document.querySelector('#link').disabled = false;
+          }
+
+          if (name === 'unlink') {
+            var articleUID = document.querySelector('#articleUID').value;
+            var articleDesc = document.querySelector('#articleDesc').value;
+            var positionUID = document.querySelector('#positionUID').value;
+            var positionDesc = document.querySelector('#positionDesc').value;
+
+            if (!articleUID || !positionUID || links.filter(link => link.positionUID === positionUID).length === 0) return;
+
+            links = links.filter(link => link.positionUID !== positionUID);
+            localStorage.setItem('links', JSON.stringify(links));
+
+            document.querySelector('#table').removeChild(document.querySelector(`#${positionUID}`));
+
+            cleanForm();
+            document.querySelector('#unlink').disabled = false;
+            document.querySelector('#link').disabled = false;
+            //document.querySelector('#articleUID').disabled = false;
+            //document.querySelector('#articleUID').value = '';
+            //document.querySelector('#articleUID').disabled = true;
+            //document.querySelector('#articleDesc').disabled = false;
+            //document.querySelector('#articleDesc').value = '';
+            //document.querySelector('#articleDesc').disabled = true;
+            //document.querySelector('#positionUID').disabled = false;
+            //document.querySelector('#positionUID').value = '';
+            //document.querySelector('#positionUID').disabled = true;
+            //document.querySelector('#positionDesc').disabled = false;
+            //document.querySelector('#positionDesc').value = '';
+            //document.querySelector('#positionDesc').disabled = true;
+          }
+
+          if (name === 'clean') {
+            cleanForm();
+            document.querySelector('#unlink').disabled = false;
+            document.querySelector('#link').disabled = false;
+            //document.querySelector('#articleUID').disabled = false;
+            //document.querySelector('#articleUID').value = '';
+            //document.querySelector('#articleUID').disabled = true;
+            //document.querySelector('#articleDesc').disabled = false;
+            //document.querySelector('#articleDesc').value = '';
+            //document.querySelector('#articleDesc').disabled = true;
+            //document.querySelector('#positionUID').disabled = false;
+            //document.querySelector('#positionUID').value = '';
+            //document.querySelector('#positionUID').disabled = true;
+            //document.querySelector('#positionDesc').disabled = false;
+            //document.querySelector('#positionDesc').value = '';
+            //document.querySelector('#positionDesc').disabled = true;
+          }
+        };
+
+        const form = document.querySelector('#form');
+        form.addEventListener('submit', submitForm);
 
     </script>
   </body>
