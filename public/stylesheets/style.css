@@ -1,6 +1,5 @@
 * {
-  /* margin: 0;
-  padding: 0; */
+  /* border: 1px solid black; */
 }
 
 body {
@@ -10,6 +9,19 @@ body {
 
 a {
   color: #00B7FF;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+}
+
+.fiwave {
+  height: 60px;
+}
+
+.bosonit {
+  height: 30px;
 }
 
 .grid {
@@ -27,12 +39,38 @@ input {
   text-align: center;
 }
 
-button.button {
+#display {
+  border: 1px solid black;
+  margin-top: 15px;
+  height: 40px;
+  width: 400px;
+  grid-column-start: 1;
+  grid-column-end: span 3;
+  justify-self: center;
+  display: table;
+}
+
+#text {
+  display: table-cell;
+  vertical-align: middle; 
+  text-align: center; 
+}
+
+.button {
   /* justify-self: center; */
   margin: 20px;
   padding: 3px;
   /* grid-column-start: 1;
   grid-column-end: span 3; */
+}
+
+container {
+  display: flex;
+}
+
+#reset{
+  padding: 5px;
+  margin: 5px;
 }
 
 th, td {

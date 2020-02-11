@@ -5,6 +5,10 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body>
+    <div class="header">
+      <img class="fiwave" src="./images/fiwave.svg" alt="">
+      <img class="bosonit" src="./images/logo-bosonit.png" alt="">
+    </div>
     <h1><%= title %></h1>
     <p><strong>TAGS</strong></p>
     <form id="form" action="" class="grid">
@@ -15,20 +19,17 @@
         <label for="position">Posición</label>
         <input id="positionUID" type="text" disabled>
         <input id="positionDesc" type="text" disabled>
+        <div id="display"><p id="text"></p></div>
         <button id="link" name="link" class="button" disabled>Vincular</button>
         <button id="unlink"name="unlink"  class="button" disabled>Desvincular</button>
-        <button id="clean"name="clean"  class="button">Limpiar</button>
+        <button id="clean" name="clean" class="button">Limpiar</button>
     </form>
+    <p><strong>VÍNCULOS</strong></p>
+    <div class="container"><button id="reset">Borrar vínculos</button></div>
     <table id="table">
       <tr>
         <th colspan="2">ARTÍCULO</th>
         <th colspan="2">POSICIÓN</th>
-      </tr>
-      <tr>
-        <!-- <td>E2004144850502080540E0B9</td>
-        <td>Artículo 0</td>
-        <td>E2004144850502080540E0B9</td>
-        <td>Posición 0</td> -->
       </tr>
     </table>
     <ul id="tags"></ul>
@@ -84,13 +85,28 @@
           }
 
           if (articleUID.value !== '' && positionUID.value !== '') {
-            if (links.filter(link => link.positionUID === positionUID.value).length === 0) {
+            /* Si la posición y el artículo no se encuentran
+            en la base de datos, se habilita vincular*/
+            if ((links.filter(link => link.positionUID === positionUID.value).length === 0) && (links.filter(link => link.articleUID === articleUID.value).length === 0)) {
               document.querySelector('#unlink').disabled = true;
               document.querySelector('#link').disabled = false;
-            } else {
+              document.querySelector('#text').innerHTML = 'Elementos no vinculados. Puede vincularlos';
+              return;
+            }
+            /* Si la posición y el artículo se encuentran
+            vinculados en la base de datos, se habilita desvincular*/
+            if (links.filter(link => (link.positionUID === positionUID.value) && (link.articleUID === articleUID.value)).length !== 0) {
               document.querySelector('#unlink').disabled = false;
               document.querySelector('#link').disabled = true;
+              document.querySelector('#text').innerHTML = 'Elementos vinculados entre sí. Puede desvincularlos';
+              return;
             }
+            /* Si la posición y el artículo se encuentran
+            en la base de datos, pero no vinculados, no se habilitan
+            los botones*/
+              document.querySelector('#unlink').disabled = true;
+              document.querySelector('#link').disabled = true;
+              document.querySelector('#text').innerHTML = 'Elementos vinculados con otros elementos. Desvincúlelos primero para poder vincularlos';
           }
         });
 
@@ -122,6 +138,7 @@
           document.querySelector('#positionDesc').disabled = false;
           document.querySelector('#positionDesc').value = '';
           document.querySelector('#positionDesc').disabled = true;
+          document.querySelector('#text').innerHTML = '';
           sessionStorage.setItem('articleUID', '');
           sessionStorage.setItem('articleDesc', '');
           sessionStorage.setItem('positionUID', '');
@@ -242,9 +259,20 @@
           }
         };
 
-        const form = document.querySelector('#form');
-        form.addEventListener('submit', submitForm);
+        function resetTable() {
+          localStorage.setItem('links', JSON.stringify([]));
+          document.querySelector('#table').innerHTML = `
+          <tr>
+            <th colspan="2">ARTÍCULO</th>
+            <th colspan="2">POSICIÓN</th>
+          </tr>
+          `
+        }
 
+        const form = document.querySelector('#form');
+        const restButton = document.querySelector('#reset');
+        form.addEventListener('submit', submitForm);
+        restButton.addEventListener('click', resetTable)
     </script>
   </body>
 </html>
