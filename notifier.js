@@ -24,29 +24,41 @@ var stats = fs.statSync(logPath);
 var fileSizeInBytes = stats['size'];
 
 function printUID(newFileSizeInBytes) {
-  let data = fs.readFileSync(logPath, 'utf-8');
+  try {
+    let data = fs.readFileSync(logPath, 'utf-8');
 
-  var lines = data.trim().split('\n');
-  var lastLine = lines.slice(-1)[0];
+    var lines = data.trim().split('\n');
+    var lastLine = lines.slice(-1)[0];
 
-  var fields = lastLine.split(';');
-  // console.log("TCL: printUID -> fields", fields)
-  var UID = fields[3];
-  var time = fields[6];
-  var kind = tagsUIDs.includes(UID) ? tags.filter(tag => tag.UID === UID)[0].type : undefined;
-  var description = tagsUIDs.includes(UID) ? tags.filter(tag => tag.UID === UID)[0].description : undefined;
+    var fields = lastLine.split(';');
+    // console.log("TCL: printUID -> fields", fields)
+    var UID = fields[3];
+    var time = fields[6];
+    var kind = tagsUIDs.includes(UID) ? tags.filter(tag => tag.UID === UID)[0].type : undefined;
+    var description = tagsUIDs.includes(UID) ? tags.filter(tag => tag.UID === UID)[0].description : undefined;
 
-  console.log(`[NOTIFIER] UID : ${UID}, Time : ${time}, Type : ${kind}, Description : ${description}, Log size : ${newFileSizeInBytes} bytes`);
+    console.log(`[NOTIFIER] UID : ${UID}, Time : ${time}, Type : ${kind}, Description : ${description}, Log size : ${newFileSizeInBytes} bytes`);
 
-  requester.send({
-    type: 'notification',
-    UID: UID,
-    time: time,
-    kind: kind,
-    description: description
-  }, response => {
-    console.log(`[NOTIFIER] Respuesta --> ${response}`, Date.now());
-  });
+    requester.send({
+      type: 'notification',
+      UID: UID,
+      time: time,
+      kind: kind,
+      description: description
+    }, response => {
+      let date_ob = new Date();
+      let hours = date_ob.getHours();
+      let minutes = date_ob.getMinutes();
+      let seconds = date_ob.getSeconds();
+      if (seconds < 10) seconds = '0' + seconds;
+      console.log(`[NOTIFIER] Respuesta --> ${response}, Time: ${hours}:${minutes}:${seconds}
+      `);
+    });
+  } catch {
+    console.log(`[NOTIFIER] Error de lectura capturado
+    `)
+    printUID(newFileSizeInBytes);
+  };
 }
 
 function checkFileSize() {
@@ -61,6 +73,6 @@ function checkFileSize() {
   }
 }
 
-setInterval(checkFileSize, 3000);
+setInterval(checkFileSize, 1000);
 
 
