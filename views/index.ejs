@@ -15,8 +15,8 @@
         <label for="position">Posición</label>
         <input id="positionUID" type="text" disabled>
         <input id="positionDesc" type="text" disabled>
-        <button id="link" name="link" class="button">Vincular</button>
-        <button id="unlink"name="unlink"  class="button">Desvincular</button>
+        <button id="link" name="link" class="button" disabled>Vincular</button>
+        <button id="unlink"name="unlink"  class="button" disabled>Desvincular</button>
         <button id="clean"name="clean"  class="button">Limpiar</button>
     </form>
     <table id="table">
@@ -189,8 +189,8 @@
             links = localStorage.setItem('links', JSON.stringify(links))
 
             cleanForm();
-            document.querySelector('#unlink').disabled = false;
-            document.querySelector('#link').disabled = false;
+            document.querySelector('#unlink').disabled = true;
+            document.querySelector('#link').disabled = true;
           }
 
           if (name === 'unlink') {
@@ -207,8 +207,8 @@
             document.querySelector('#table').removeChild(document.querySelector(`#${positionUID}`));
 
             cleanForm();
-            document.querySelector('#unlink').disabled = false;
-            document.querySelector('#link').disabled = false;
+            document.querySelector('#unlink').disabled = true;
+            document.querySelector('#link').disabled = true;
             //document.querySelector('#articleUID').disabled = false;
             //document.querySelector('#articleUID').value = '';
             //document.querySelector('#articleUID').disabled = true;
@@ -225,8 +225,8 @@
 
           if (name === 'clean') {
             cleanForm();
-            document.querySelector('#unlink').disabled = false;
-            document.querySelector('#link').disabled = false;
+            document.querySelector('#unlink').disabled = true;
+            document.querySelector('#link').disabled = true;
             //document.querySelector('#articleUID').disabled = false;
             //document.querySelector('#articleUID').value = '';
             //document.querySelector('#articleUID').disabled = true;
